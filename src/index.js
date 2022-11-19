@@ -10,19 +10,86 @@ app.use(cors());
 const users = [];
 
 function checksExistsUserAccount(request, response, next) {
-  // Complete aqui
+  const { username }= request.headers
+
+  const user = users.find((user) => user.username === username)
+
+  if(!user){
+    return response.status(404).json({error:"user not found "})
+
+  }
+
+  request.user= user
+
+  return next();
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+  const { user } = request;
+
+  if(!user.pro){
+    next()
+  }
+
+  if(user.pro && user.todos.length <= 10 ){
+    next ()
+  }else{
+    return response.status(403).json({error:"No more To dos avalaible"})
+  }
+
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
-}
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  //const uuid = uuidv4()
+
+  const user = users.find((user  => user.username === username));
+
+ if(!user) {
+    return response.status(404).json({error:"user not found"});
+  }
+
+  const todo = user.todos.find(todo => todo.id === id)
+  if(!todo) {
+    return response.status(404).json({error:"Todo doest exists"});
+  }
+  //if(id != uuid){
+  //  return response.status(400).json({error:"invalid ID"})
+  //}
+
+  //const uuid = users.find((user => user.id === uuidv4));
+  //if(!uuid) {
+  //return response.status(400).json({error:"isnt a valid ID"});
+ //}
+
+
+request.user = user;
+request.todo = todo;
+  
+
+return next()
+  };
+
+
 
 function findUserById(request, response, next) {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+
+ 
+  const pegaId = users.find((user => user.id === id))
+
+  if(!pegaId){
+    return response.status(404).json({error:"id not found "})
+
+  }
+
+  request.user= user
+  request.id = id
+
+  return next();
 }
 
 app.post('/users', (request, response) => {
